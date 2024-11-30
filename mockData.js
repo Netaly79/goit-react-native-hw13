@@ -6,9 +6,13 @@ export const travelCards = [
     location: "Париж, Франція",
     likes: 152,
     comments: [
-      { id: 1, user: "Anna", text: "Який шикарний вигляд!" },
-      { id: 2, user: "Ihor", text: "Мрію побувати тут." }
+      { id: 1, user: "Anna", text: "Який шикарний вигляд!", dateTime: "09 червня, 2020 | 08:40"},
+      { id: 2, user: "Ihor", text: "Мрію побувати тут.", dateTime: "12 червня, 2020 | 12:40" }
     ],
+    geoLocation: {
+      latitude: 60.73061,
+      longitude: -73.935242,
+    },
   },
   {
     id: 2,
@@ -17,8 +21,12 @@ export const travelCards = [
     location: "Аризона, США",
     likes: 98,
     comments: [
-      { id: 1, user: "Oleh", text: "Неймовірне місце!" },
+      { id: 1, user: "Oleh", text: "Неймовірне місце!", dateTime: "07 червня, 2020 | 07:40" },
     ],
+    geoLocation: {
+      latitude: 50.73061,
+      longitude: -53.935242,
+    },
   },
   {
     id: 3,
@@ -27,5 +35,9 @@ export const travelCards = [
     location: "Тромсе, Норвегія",
     likes: 203,
     comments: [],
+    geoLocation: {
+      latitude: 40.73061,
+      longitude: -73.935242,
+    },
   },
 ];

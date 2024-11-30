@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import ProfileScreen from "../../screens/ProfileScreen";
 import CreatePostsScreen from "../../screens/CreatePostsScreen";
 import ProfileIconComponent from "../../assets/icons/ProfileIconComponent";
@@ -23,9 +24,18 @@ const TabNavigator = ({ setLogged }) => {
     </TouchableOpacity>
   );
 
-  const forwardBackButton = (navigation) => (
-    <BackButtonComponent onPress={() => navigation.goBack()} />
-  );
+  const getTabBarVisibility = (route) => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+    if (routeName === "Comments" || routeName === "Map") {
+      return { display: "none" };
+    }
+    return { display: "flex" };
+  };
+
+  const getHeaderVisibility = (route) => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+    return !(routeName === "Comments" || routeName === "Map");
+  };
 
   return (
     <Tab.Navigator
@@ -48,11 +58,10 @@ const TabNavigator = ({ setLogged }) => {
 
         tabBarActiveTintColor: "#FF6C00",
         tabBarInactiveTintColor: "gray",
-        tabBarStyle: {
-          backgroundColor: "#FFF",
-          height: 80,
-          justifyContent: "center",
-        },
+        tabBarStyle: ({ state }) =>
+          isTabVisible(state)
+            ? { backgroundColor: "#FFF", height: 80, justifyContent: "center" }
+            : { display: "none" },
         tabBarIconStyle: {
           justifyContent: "center",
           alignItems: "center",
@@ -85,19 +94,24 @@ const TabNavigator = ({ setLogged }) => {
       })}>
       <Tab.Screen
         name="Posts"
-        component={PostNavigator}
-        options={{
+        options={({ route }) => ({
           title: "Публікації",
-          headerRight: () => logOut(setLogged),
-        }}
-      />
+          headerRight: logOut,
+          tabBarStyle: getTabBarVisibility(route),
+          headerShown: getHeaderVisibility(route),
+        })}>
+        {(props) => <PostNavigator {...props} setLogged={setLogged} />}
+      </Tab.Screen>
       <Tab.Screen
         name="Add"
         component={CreatePostsScreen}
         options={({ navigation }) => ({
+          tabBarStyle: { display: 'none'},
           headerShown: true,
           title: "Створити публікацію",
-          headerLeft: () => forwardBackButton(navigation),
+          headerLeft: () => (
+            <BackButtonComponent onPress={() => navigation.goBack()} />
+          ),
         })}
       />
       <Tab.Screen name="Profile" component={ProfileScreen} />

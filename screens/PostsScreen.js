@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Image,
   StyleSheet,
@@ -11,9 +11,27 @@ import {
 import { travelCards } from "../mockData.js";
 import PostCard from "../Components/PostCard.js";
 
-const PostsScreen = () => {
+const PostsScreen = ({navigation, route}) => {
   const photo_block = require("../assets/avatar.jpeg");
   const posts = travelCards;
+
+  const navigateToComments = (item) => {
+    navigation.navigate("Comments", { item });
+  };
+  const navigateToMap = (item) => {
+    navigation.navigate("Map", { item });
+  };
+
+  useEffect(() => {
+    if (route?.params?.user) {
+      console.log({ user: route.params.user });
+    }
+    if (route?.params?.post) {
+      setPosts((prev) => {
+        return [...prev, route?.params?.post];
+      });
+    }
+  }, [route?.params?.post, route?.params?.user]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -29,7 +47,10 @@ const PostsScreen = () => {
           style={styles.list}
           data={posts}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <PostCard item={item} />}
+          renderItem={({ item }) => <PostCard
+          item={item}
+          navigateToComments={() => navigateToComments(item)}
+          navigateToMap={() => navigateToMap(item)} />}
         />
       </View>
     </SafeAreaView>

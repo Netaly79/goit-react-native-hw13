@@ -1,15 +1,23 @@
+import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+import { TouchableOpacity } from "react-native";
 import PostsScreen from "../../screens/PostsScreen";
 import MapScreen from "../../screens/MapScreen";
 import CommentsScreen from "../../screens/CommentsScreen";
 import BackButtonComponent from "../BackButtonComponent";
+import LogOutComponent from "../../assets/icons/LogOutIconComponent";
 
 const Posts = createStackNavigator();
-
-const PostNavigator = () => {
-  const forwardBackButton = (navigation) => (
-    <BackButtonComponent onPress={() => navigation.goBack()} />
+const PostNavigator = ({ navigation, setLogged }) => {
+  console.log(setLogged);
+  const logOut = () => (
+    <TouchableOpacity onPress={handleLogOut}>
+      <LogOutComponent />
+    </TouchableOpacity>
   );
+  const handleLogOut = () => {
+    setLogged(false);
+  };
 
   return (
     <Posts.Navigator
@@ -21,7 +29,11 @@ const PostNavigator = () => {
       <Posts.Screen
         name="AllPosts"
         component={PostsScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          title: "Публікації",
+          headerRight: () => logOut(setLogged),
+        }}
       />
       <Posts.Screen
         name="Map"
@@ -29,7 +41,9 @@ const PostNavigator = () => {
         options={({ navigation }) => ({
           headerShown: true,
           title: "Мапа",
-          headerLeft: () => forwardBackButton(navigation),
+          headerLeft: () => (
+            <BackButtonComponent onPress={() => navigation.goBack()} />
+          ),
         })}
       />
       <Posts.Screen
@@ -38,7 +52,9 @@ const PostNavigator = () => {
         options={({ navigation }) => ({
           headerShown: true,
           title: "Коментарі",
-          headerLeft: () => forwardBackButton(navigation),
+          headerLeft: () => (
+            <BackButtonComponent onPress={() => navigation.goBack()} />
+          ),
         })}
       />
     </Posts.Navigator>

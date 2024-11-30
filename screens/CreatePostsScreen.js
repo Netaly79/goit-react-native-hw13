@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -10,36 +10,104 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import uuid from "react-native-uuid";
+import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import LocationIconComponent from "../assets/icons/LocationIconComponent";
 import PhotoIconComponent from "../assets/icons/PhotoIconComponent";
+import BasketIconComponent from "../assets/icons/BasketIconComponent";
+import * as Location from "expo-location";
 
-const CreatePostsScreen = () => {
+const CreatePostsScreen = (props) => {
+  
   const [inputs, setInputs] = useState({
     title: "",
     location: "",
   });
 
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [geoLocation, setGeoLocation] = useState(null);
+
   const handleInputChange = (name, value) => {
     setInputs((prev) => ({ ...prev, [name]: value }));
   };
 
-  onOpenCamera = () => {
-    console.log("Open camera");
+  const handleTakePicture = async () => {
+    if (camera.current) {
+      const picture = await camera.current.takePictureAsync();
+      if (picture?.uri) {
+        setPhotoUrl(picture.uri);
+        await MediaLibrary.createAssetAsync(picture.uri);
+      }
+    }
   };
 
   onUploadPhoto = () => {};
 
-  onPublishPhoto = () => {};
+  onPublishPhoto = () => {
+    if (isButtonDisabled) {
+      alert("Please fill in all fields.");
+      return;
+    }
+    const post = {
+      id: uuid.v4(),
+      photo: photoUrl,
+      title: inputs.title,
+      comments: [],
+      likes: 0,
+      location: inputs.location,
+      geoLocation,
+    };
+    props.navigation.navigate("Posts", { post });
+    setInputs({"title": "", "location": ""});
+    setPhotoUrl("");
+  };
+
+  onClean = () => {
+    setInputs({"title": "", "location": ""});
+    setPhotoUrl("");
+  }
 
   const isButtonDisabled = !(inputs.title.trim() && inputs.location.trim());
+
+  const [facing, setFacing] = useState("back");
+  const [permission, requestPermission] = useCameraPermissions();
+
+  if (!permission) {
+    return <View />;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>
+          We need your permission to show the camera
+        </Text>
+        <Button onPress={requestPermission} title="grant permission" />
+      </View>
+    );
+  }
+
+  function toggleCameraFacing() {
+    setFacing((current) => (current === "back" ? "front" : "back"));
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        <View style={styles.wrapperVertical}>
         <View style={styles.photoBlock}>
-          <TouchableOpacity onPress={onOpenCamera} style={styles.photoIcon}>
-            <PhotoIconComponent />
-          </TouchableOpacity>
+          <CameraView style={styles.camera} facing={facing}>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity onPress={handleTakePicture} style={styles.photoIcon}>
+                <PhotoIconComponent />
+              </TouchableOpacity>
+            </View>
+            </CameraView>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={toggleCameraFacing}>
+              <Text style={styles.text}>Flip Camera</Text>
+            </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={onUploadPhoto}>
           <Text style={styles.upload}>Завантажте фото</Text>
@@ -76,9 +144,16 @@ const CreatePostsScreen = () => {
               styles.activeSubmitButtonText,
               isButtonDisabled && styles.submitButtonText,
             ]}>
-            {" "}
             Опубліковати
           </Text>
+        </Pressable>
+        </View>
+        <Pressable
+          onPress={onClean}
+          style={[
+            styles.basketButton
+          ]}>
+          <BasketIconComponent />
         </Pressable>
       </View>
     </SafeAreaView>
@@ -96,6 +171,8 @@ const styles = StyleSheet.create({
 
     marginHorizontal: 16,
     marginVertical: 32,
+    flexDirection: "column",
+    justifyContent: "space-between"
   },
   photoBlock: {
     height: 240,
@@ -107,6 +184,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
+    position: "relative",
   },
   photoIcon: {
     padding: 18,
@@ -168,6 +246,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
     color: "#fff",
   },
+  button: {
+    right: 10,
+    bottom: 10,
+    position: "absolute",
+  },
+  basketButton: {
+    width: 70,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F6F6F6',
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: "auto",
+  }
 });
 
 export default CreatePostsScreen;

@@ -1,30 +1,31 @@
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import CommentIconComponent from "../assets/icons/CommentIconComponent";
 import LocationIconComponent from "../assets/icons/LocationIconComponent";
 
-const PostCard = ({ item }) => (
+const PostCard = ({ item, navigateToComments, navigateToMap }) => {
+  const { title, photo, description, comments, location } = item;
+  return (
   <View style={styles.card}>
-    <Image source={{ uri: item.photo }} style={styles.image} />
-    <Text style={styles.title}>{item.title}</Text>
+    <Image source={{ uri: photo }} style={styles.image} />
+    <Text style={styles.title}>{title}</Text>
     <View style={styles.desc}>
-      <View style={{flexDirection: 'row'}}>
+      <TouchableOpacity
+        style={{ flexDirection: "row" }}
+        onPress={() =>
+          navigateToComments(item)
+        }>
         <CommentIconComponent />
-        <Text style={styles.comments}>
-          {item.comments.length}
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row'}}>
+        <Text style={styles.comments}>{comments.length}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{ flexDirection: "row" }}
+        onPress={() => navigateToMap(item)}>
         <LocationIconComponent />
-      <Text style={styles.location}>{item.location}</Text>
-      </View>
+        <Text style={styles.location}>{item.location}</Text>
+      </TouchableOpacity>
     </View>
   </View>
-);
+)};
 
 const styles = StyleSheet.create({
   card: {
@@ -35,25 +36,25 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 240,
-    borderRadius: 8
+    borderRadius: 8,
   },
   title: {
-    color: '#212121',
-    fontFamily: 'Roboto',
+    color: "#212121",
+    fontFamily: "Roboto",
     fontSize: 16,
     fontWeight: 500,
     margin: 8,
   },
   location: {
-    color: '#212121',
-    fontFamily: 'Roboto',
+    color: "#212121",
+    fontFamily: "Roboto",
     fontSize: 16,
-    textDecorationLine: 'underline',
-    textDecorationStyle: 'solid',
-    textDecorationSkipInk: 'none',
-    textDecorationThickness: 'auto',
-    textUnderlineOffset: 'auto',
-    textUnderlinePosition: 'from-font',
+    textDecorationLine: "underline",
+    textDecorationStyle: "solid",
+    textDecorationSkipInk: "none",
+    textDecorationThickness: "auto",
+    textUnderlineOffset: "auto",
+    textUnderlinePosition: "from-font",
     marginHorizontal: 8,
   },
   likes: {
@@ -63,8 +64,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   comments: {
-    color: '#BDBDBD',
-    fontFamily: 'Roboto',
+    color: "#BDBDBD",
+    fontFamily: "Roboto",
     fontSize: 16,
     marginHorizontal: 8,
     marginBottom: 8,
@@ -72,8 +73,8 @@ const styles = StyleSheet.create({
   desc: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between"
-  }
+    justifyContent: "space-between",
+  },
 });
 
-export default PostCard
+export default PostCard;
