@@ -11,14 +11,13 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import ArrowUpIconComponent from "../assets/icons/ArrowUpIconContainer";
+import ArrowUpIconComponent from "../assets/icons/ArrowUpButton";
 
 const CommentsScreen = (props) => {
   const item = props.route.params.item;
   const [userComment, setUserComment] = useState("");
 
   const handleSendComment = () => {
-    console.log("Sending comment", userComment);
     if (!userComment) return;
     props.navigation.navigate("AllPosts", { userComment });
     setUserComment("");
@@ -178,10 +177,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   commentEven: {
-    flexDirection: "row", // Иконка слева
+    flexDirection: "row",
   },
   commentOdd: {
-    flexDirection: "row", // Иконка справа
+    flexDirection: "row",
   },
   sendButton: {
     position: "absolute",

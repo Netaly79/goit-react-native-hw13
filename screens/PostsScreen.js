@@ -11,15 +11,15 @@ import {
 import { travelCards } from "../mockData.js";
 import PostCard from "../Components/PostCard.js";
 
-const PostsScreen = ({navigation, route}) => {
+const PostsScreen = ({ navigation, route }) => {
   const photo_block = require("../assets/avatar.jpeg");
   const posts = travelCards;
 
   const navigateToComments = (item) => {
-    navigation.navigate("Comments", { item });
+    navigation.navigate("Comments", { item, source: "AllPosts" });
   };
   const navigateToMap = (item) => {
-    navigation.navigate("Map", { item });
+    navigation.navigate("Map", { item, source: "AllPosts" });
   };
 
   useEffect(() => {
@@ -47,10 +47,13 @@ const PostsScreen = ({navigation, route}) => {
           style={styles.list}
           data={posts}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <PostCard
-          item={item}
-          navigateToComments={() => navigateToComments(item)}
-          navigateToMap={() => navigateToMap(item)} />}
+          renderItem={({ item }) => (
+            <PostCard
+              item={item}
+              navigateToComments={() => navigateToComments(item, "Posts")}
+              navigateToMap={() => navigateToMap(item)}
+            />
+          )}
         />
       </View>
     </SafeAreaView>

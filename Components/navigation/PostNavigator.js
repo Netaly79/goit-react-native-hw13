@@ -9,7 +9,6 @@ import LogOutComponent from "../../assets/icons/LogOutIconComponent";
 
 const Posts = createStackNavigator();
 const PostNavigator = ({ navigation, setLogged }) => {
-  console.log(setLogged);
   const logOut = () => (
     <TouchableOpacity onPress={handleLogOut}>
       <LogOutComponent />
@@ -38,23 +37,45 @@ const PostNavigator = ({ navigation, setLogged }) => {
       <Posts.Screen
         name="Map"
         component={MapScreen}
-        options={({ navigation }) => ({
+        options={({ route, navigation }) => ({
           headerShown: true,
           title: "Мапа",
-          headerLeft: () => (
-            <BackButtonComponent onPress={() => navigation.goBack()} />
-          ),
+          headerLeft: () => {
+            const source = route.params?.source;
+            return (
+              <BackButtonComponent
+                onPress={() => {
+                  if (source === "Profile") {
+                    navigation.navigate("Profile");
+                  } else {
+                    navigation.navigate("AllPosts");
+                  }
+                }}
+              />
+            );
+          },
         })}
       />
       <Posts.Screen
         name="Comments"
         component={CommentsScreen}
-        options={({ navigation }) => ({
+        options={({ route, navigation }) => ({
           headerShown: true,
           title: "Коментарі",
-          headerLeft: () => (
-            <BackButtonComponent onPress={() => navigation.goBack()} />
-          ),
+          headerLeft: () => {
+            const source = route.params?.source;
+            return (
+              <BackButtonComponent
+                onPress={() => {
+                  if (source === "Profile") {
+                    navigation.navigate("Profile");
+                  } else {
+                    navigation.navigate("AllPosts");
+                  }
+                }}
+              />
+            );
+          },
         })}
       />
     </Posts.Navigator>

@@ -175,7 +175,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   addPhoto: {
-    zIndex: 2,
     position: "absolute",
     bottom: 0,
     right: 0,

@@ -106,7 +106,7 @@ const TabNavigator = ({ setLogged }) => {
         name="Add"
         component={CreatePostsScreen}
         options={({ navigation }) => ({
-          tabBarStyle: { display: 'none'},
+          tabBarStyle: { display: "none" },
           headerShown: true,
           title: "Створити публікацію",
           headerLeft: () => (
@@ -114,7 +114,18 @@ const TabNavigator = ({ setLogged }) => {
           ),
         })}
       />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen
+        name="Profile"
+        options={() => ({
+          tabBarStyle: { display: "flex" },
+          headerShown: false,
+          title: "Створити публікацію",
+          // headerLeft: () => (
+          //   <BackButtonComponent onPress={() => navigation.goBack()} />
+          // )
+        })}>
+        {(props) => <ProfileScreen {...props} setLogged={setLogged} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };

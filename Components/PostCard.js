@@ -1,31 +1,46 @@
 import { Image, StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import CommentIconComponent from "../assets/icons/CommentIconComponent";
 import LocationIconComponent from "../assets/icons/LocationIconComponent";
+import LikeIconComponent from "../assets/icons/LikeIconComponent";
 
-const PostCard = ({ item, navigateToComments, navigateToMap }) => {
-  const { title, photo, description, comments, location } = item;
+const PostCard = ({
+  item,
+  navigateToComments,
+  navigateToMap,
+  isProfileView = false,
+}) => {
+  const { title, photo, description, comments, location, likes } = item;
   return (
-  <View style={styles.card}>
-    <Image source={{ uri: photo }} style={styles.image} />
-    <Text style={styles.title}>{title}</Text>
-    <View style={styles.desc}>
-      <TouchableOpacity
-        style={{ flexDirection: "row" }}
-        onPress={() =>
-          navigateToComments(item)
-        }>
-        <CommentIconComponent />
-        <Text style={styles.comments}>{comments.length}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ flexDirection: "row" }}
-        onPress={() => navigateToMap(item)}>
-        <LocationIconComponent />
-        <Text style={styles.location}>{item.location}</Text>
-      </TouchableOpacity>
+    <View style={styles.card}>
+      <Image source={{ uri: photo }} style={styles.image} />
+      <Text style={styles.title}>{title}</Text>
+      <View style={styles.desc}>
+        <TouchableOpacity
+          style={{ flexDirection: "row" }}
+          onPress={() =>
+            navigateToComments(item, isProfileView ? "Profile" : "Post")
+          }>
+          <CommentIconComponent isProfileView={isProfileView} />
+          <Text style={styles.comments}>{comments.length}</Text>
+          {isProfileView && (
+            <>
+              <LikeIconComponent />
+              <Text style={styles.comments}>{likes}</Text>
+            </>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ flexDirection: "row" }}
+          onPress={() =>
+            navigateToMap(item, isProfileView ? "Profile" : "Posts")
+          }>
+          <LocationIconComponent />
+          <Text style={styles.location}>{item.location}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-)};
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
