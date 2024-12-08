@@ -62,7 +62,6 @@ export const getPosts = async (userId) => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.log("docSnap", docSnap.data());
       return docSnap.data().posts;
     } else {
       console.warn("No such document!");
