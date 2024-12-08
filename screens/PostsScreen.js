@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -8,30 +8,58 @@ import {
   Platform,
   SafeAreaView,
 } from "react-native";
-import { travelCards } from "../mockData.js";
 import PostCard from "../Components/PostCard.js";
+import { useSelector } from "react-redux";
+import { getPosts } from "../DB_Utils/store.js";
+import { useFocusEffect } from "@react-navigation/native";
+
+const fetchUserPosts = async (userId) => {
+  try {
+    const posts = await getPosts(userId);
+
+    if (!Array.isArray(posts)) {
+      console.error("Posts is not an array!");
+      return [];
+    }
+
+    return posts;
+  } catch (error) {
+    console.error("Error in fetchUserPosts:", error);
+    return [];
+  }
+};
 
 const PostsScreen = ({ navigation, route }) => {
+  const [posts, setPosts] = useState([]);
   const photo_block = require("../assets/avatar.jpeg");
-  const posts = travelCards;
+
+  const user = useSelector((state) => state.user.userInfo);
 
   const navigateToComments = (item) => {
-    navigation.navigate("Comments", { item, source: "AllPosts" });
+    navigation.navigate("Comments", { item, user, source: "AllPosts" });
   };
+
   const navigateToMap = (item) => {
     navigation.navigate("Map", { item, source: "AllPosts" });
   };
 
   useEffect(() => {
-    if (route?.params?.user) {
-      console.log({ user: route.params.user });
-    }
-    if (route?.params?.post) {
-      setPosts((prev) => {
-        return [...prev, route?.params?.post];
-      });
-    }
-  }, [route?.params?.post, route?.params?.user]);
+    fetchUserPosts(user.uid);
+}, [route?.params?.comment, route?.params?.postId]);
+
+useFocusEffect(
+    React.useCallback(() => {
+        const loadPosts = async () => {
+            if (user?.uid) {
+                const userPosts = await fetchUserPosts(user.uid);
+                setPosts(userPosts);
+            }
+        };
+
+        loadPosts();
+    }, [user?.uid])
+);
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -39,8 +67,8 @@ const PostsScreen = ({ navigation, route }) => {
         <View style={styles.header}>
           <Image style={styles.avatar} source={photo_block} />
           <View style={styles.user}>
-            <Text style={styles.userName}>Natali Romanova</Text>
-            <Text style={styles.userEmail}>email@example.com</Text>
+            <Text style={styles.userName}>{user?.displayName}</Text>
+            <Text style={styles.userEmail}>{user?.email}</Text>
           </View>
         </View>
         <FlatList
@@ -68,7 +96,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginHorizontal: 16
+    marginHorizontal: 16,
   },
   header: {
     flexDirection: "row",
@@ -100,7 +128,7 @@ const styles = StyleSheet.create({
   },
   navigator: {
     flex: 0.1,
-    marginBottom: 34
+    marginBottom: 34,
   },
 });
 

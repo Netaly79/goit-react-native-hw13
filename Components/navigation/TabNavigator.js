@@ -10,12 +10,15 @@ import GridIconComponent from "../../assets/icons/GridIconComponent";
 import LogOutComponent from "../../assets/icons/LogOutIconComponent";
 import PostNavigator from "./PostNavigator";
 import BackButtonComponent from "../BackButtonComponent";
+import { logoutDB } from "../../DB_Utils/auth";
+import { useDispatch } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = ({ setLogged }) => {
+  const dispatch = useDispatch();
   const handleLogOut = () => {
-    setLogged(false);
+    logoutDB(dispatch);
   };
 
   const logOut = () => (

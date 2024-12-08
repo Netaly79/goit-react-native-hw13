@@ -7,17 +7,23 @@ import {
   StatusBar,
   Platform,
   Text,
+  Button,
   TextInput,
   Pressable,
 } from "react-native";
 import uuid from "react-native-uuid";
+import { useSelector } from "react-redux";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import LocationIconComponent from "../assets/icons/LocationIconComponent";
 import PhotoIconComponent from "../assets/icons/PhotoIconComponent";
 import BasketIconComponent from "../assets/icons/BasketIconComponent";
-import * as Location from "expo-location";
+import { addPost } from "../DB_Utils/store";
 
 const CreatePostsScreen = (props) => {
+
+  const user = useSelector((state) => {
+    return state.user.userInfo;
+  });
   
   const [inputs, setInputs] = useState({
     title: "",
@@ -25,7 +31,6 @@ const CreatePostsScreen = (props) => {
   });
 
   const [photoUrl, setPhotoUrl] = useState("");
-  const [geoLocation, setGeoLocation] = useState(null);
 
   const handleInputChange = (name, value) => {
     setInputs((prev) => ({ ...prev, [name]: value }));
@@ -41,26 +46,62 @@ const CreatePostsScreen = (props) => {
     }
   };
 
-  onUploadPhoto = () => {};
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permission to access media library is required!");
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      allowsEditing: false,
+      quality: 1,
+    });
 
-  onPublishPhoto = () => {
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      
+      setSelectedImage(uri);
+  
+      const response = await fetch(uri);
+      const file = await response.blob();
+      const fileName = uri.split('/').pop(); // Отримуємо ім'я файлу з URI
+      const fileType = file.type; // Отримуємо тип файлу
+      const imageFile = new File([file], fileName, { type: fileType });
+      const uploadedImage = await uploadImage(user.uid, imageFile, fileName);
+      setUploadedImage(uploadedImage)
+    }
+  };
+
+  onPublishPhoto = async () => {
     if (isButtonDisabled) {
       alert("Please fill in all fields.");
       return;
     }
+  
     const post = {
       id: uuid.v4(),
-      photo: photoUrl,
+      photo: photoUrl || "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
       title: inputs.title,
       comments: [],
       likes: 0,
       location: inputs.location,
-      geoLocation,
     };
+  
+    if (!user) return;
+  
+    try {
+      await addPost(user?.uid, { ...post });
+    } catch (error) {
+      console.error('Error adding post:', error);
+    }
+  
     props.navigation.navigate("Posts", { post });
-    setInputs({"title": "", "location": ""});
+    setInputs({ title: "", location: "" });
     setPhotoUrl("");
   };
+  
 
   onClean = () => {
     setInputs({"title": "", "location": ""});
@@ -109,7 +150,7 @@ const CreatePostsScreen = (props) => {
               <Text style={styles.text}>Flip Camera</Text>
             </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={onUploadPhoto}>
+        <TouchableOpacity onPress={pickImage}>
           <Text style={styles.upload}>Завантажте фото</Text>
         </TouchableOpacity>
         <TextInput

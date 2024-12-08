@@ -11,15 +11,26 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import uuid from "react-native-uuid";
 import ArrowUpIconComponent from "../assets/icons/ArrowUpButton";
+import { addCommentToPost } from "../DB_Utils/store";
 
 const CommentsScreen = (props) => {
   const item = props.route.params.item;
+  const userId = props.route.params.user.uid;
   const [userComment, setUserComment] = useState("");
 
   const handleSendComment = () => {
     if (!userComment) return;
-    props.navigation.navigate("AllPosts", { userComment });
+    const newComment = {
+      id: uuid.v4(),
+      text: userComment,
+      userId: userId,
+      timestamp: new Date().toISOString(),
+    };
+  
+    addCommentToPost(userId, item.id, newComment);
+    props.navigation.navigate("AllPosts", { userComment, comment: true });
     setUserComment("");
   };
 

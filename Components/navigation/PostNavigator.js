@@ -6,16 +6,19 @@ import MapScreen from "../../screens/MapScreen";
 import CommentsScreen from "../../screens/CommentsScreen";
 import BackButtonComponent from "../BackButtonComponent";
 import LogOutComponent from "../../assets/icons/LogOutIconComponent";
+import { logoutDB } from "../../DB_Utils/auth";
+import { useDispatch } from "react-redux";
 
 const Posts = createStackNavigator();
-const PostNavigator = ({ navigation, setLogged }) => {
+const PostNavigator = ({ navigation }) => {
+  const dispatch = useDispatch();
   const logOut = () => (
     <TouchableOpacity onPress={handleLogOut}>
       <LogOutComponent />
     </TouchableOpacity>
   );
   const handleLogOut = () => {
-    setLogged(false);
+    logoutDB(dispatch);
   };
 
   return (

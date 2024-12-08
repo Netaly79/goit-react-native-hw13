@@ -8,7 +8,7 @@ const MainStack = createStackNavigator();
 const MainStackNavigator = ({ setLogged }) => (
   <MainStack.Navigator initialRouteName="Login">
     <MainStack.Screen name="Login" options={{ headerShown: false }}>
-      {(props) => <LoginScreen {...props} setLogged={setLogged} />}
+      {(props) => <LoginScreen {...props} />}
     </MainStack.Screen>
     <MainStack.Screen
       name="Registration"

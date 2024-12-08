@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   Alert,
   Image,
@@ -14,6 +15,7 @@ import {
   TextInput,
 } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { registerDB } from "../DB_Utils/auth";
 
 import AddPhotoComponent from "../assets/icons/AddPhotoIconComponent";
 const image = require("../assets/photo_bg.png");
@@ -25,6 +27,7 @@ const RegistrationScreen = () => {
     });
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   
   const handleInputChange = (name, value) => {
     setInputs((prev) => ({ ...prev, [name]: value }));
@@ -56,7 +59,9 @@ const RegistrationScreen = () => {
       Alert.alert("Помилка", "Пароль повинен бути не менше 6 символів");
       return;
     }
-    Alert.alert("Регистрація", `${inputs.login} + ${inputs.email} + ${inputs.password}`);
+    registerDB({ displayName: inputs.login, email: inputs.email, password: inputs.password}, dispatch);
+    navigation.navigate("Login");
+    
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

@@ -12,6 +12,8 @@ import {
   Platform,
   Alert,
 } from "react-native";
+import { loginDB } from "../DB_Utils/auth";
+import { useDispatch } from "react-redux";
 
 const image = require("../assets/photo_bg.png");
 
@@ -28,8 +30,9 @@ const LoginScreen = ({ navigation, setLogged }) => {
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPassFocused, setIsPassFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const dispatch = useDispatch();
 
-  const onLogin = () => {
+  const onLogin = async () => {
     if (!inputs.email || !inputs.password) {
       Alert.alert("Помилка", "Будь ласка, заповніть усі необхідні поля");
       return;
@@ -48,8 +51,12 @@ const LoginScreen = ({ navigation, setLogged }) => {
       return;
     }
 
-    Alert.alert("Логін інфо", `${inputs.email} + ${inputs.password}`);
-    setLogged(true);
+    try {
+      await loginDB({ email: inputs.email, password: inputs.password }, dispatch)
+    } catch (err) {
+      Alert.alert("Незареєстрований користувач");
+    }
+
   };
 
   const togglePasswordVisibility = () => {
